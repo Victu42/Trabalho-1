@@ -3,10 +3,13 @@ program stats
    use, intrinsic :: iso_fortran_env, only: sp => real32, dp => real64, i4 => int32, i8 => int64
    implicit none
 
-   integer(i8) :: f_u, io
-   real(dp) :: col1(linhas()), col2(linhas())
+   integer(i8) :: f_u, io, n_linhas
+   real(dp), allocatable :: col1(:), col2(:)
 
    f_u = 11
+   n_linhas = linhas()
+
+   allocate(col1(n_linhas), col2(n_linhas))
 
    call define(col1,col2)
 
@@ -20,7 +23,7 @@ program stats
 
 contains
 
-   integer function linhas() result(n)
+   function linhas() result(n)
    
       integer(i8):: n
       n = 0
@@ -40,13 +43,13 @@ contains
    subroutine define(a, b)
       
       integer(i8) :: i
-      real(dp) :: a(linhas), b(linhas)
+      real(dp), dimension(n_linhas) :: a(:), b(:)
 
       i = 0
 
       open(f_u, file="data.txt", iostat=io, status="OLD", action="read")
    
-      do i=1, linhas
+      do i=1, n_linhas
    
          read(f_u, *, iostat=io) a(i), b(i)
          col1(i)=a(i)
@@ -60,45 +63,44 @@ contains
 
    end subroutine define
 
-   function media(m) result(m)
+   function media(col_m) result(m)
 
       integer(i8) :: j
-      real(dp) :: m
+      real(dp) :: m, col_m(:)
 
       j = 0
       m = 0
 
-      do j=1, linhas
+      do j=1, n_linhas
 
-         m = m + (m(j)/linhas)
+         m = m + (col_m(j)/n_linhas)
          if (io /= 0) exit
    
       end do 
 
    end function media
 
-   function varia(var) result(var)
+   function varia(col_v) result(var)
 
-      real(dp) :: var
+      real(dp) :: var, col_v(:), md
       integer(i8) :: k
 
       var = 0
-      k = 0
+      md = media(col_v)
 
-      do k=1, linhas 
+      do k=1, n_linhas 
 
-         var = var + ((var(i) - media(var))*2)/(linhas-1)
+         var = var + ((col_v(k) - md)*2/(n_linhas-1))
 
       end do
    
    end function varia
 
-   function desvio(dv_p) result(dv_p)
+   function desvio(col_d) result(dv_p)
    
-      real(dp) :: d_p
-      dv_p = 0
+      real(dp) :: dv_p, col_d(:)
 
-      dv_p = sqrt(var(dv_p))
+      dv_p = sqrt(varia(col_d))
 
    end function desvio
 
