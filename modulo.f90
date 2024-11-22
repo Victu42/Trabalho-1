@@ -3,8 +3,8 @@ module estatistica_basica
 use, intrinsic :: iso_fortran_env, only: sp => real32, dp => real64, i4 => int32, i8 => int64
 implicit none
 
-integer(i8) :: f_u, io, n_linhas
 real(dp), allocatable :: col1(:), col2(:)
+integer(i8) :: f_u, io, n_linhas
 
 contains
 
