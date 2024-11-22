@@ -3,58 +3,104 @@ program stats
    use, intrinsic :: iso_fortran_env, only: sp => real32, dp => real64, i4 => int32, i8 => int64
    implicit none
 
-   integer(i8) :: n, f_u, i, io
-   real(dp), allocatable :: a(:), b(:)
-   real(dp) :: media_a, media_b, var_a, var_b, dp_a, dp_b
+   integer(i8) :: f_u, io
+   real(dp) :: col1(linhas()), col2(linhas())
 
    f_u = 11
-   n = 0
-   media_a = 0
-   media_b = 0
-   var_a = 0
-   var_b = 0
 
-   open(f_u, file="data.txt", iostat=io, status="OLD", action="read")
+   call define(col1,col2)
 
-   do 
+   write(*,*) 'Média Coluna 1:',media(col1)
+   write(*,*) 'Média Coluna 2:',media(col2)
+   write(*,*) 'Variância Coluna 1:',varia(col1)
+   write(*,*) 'Variância Coluna 2:',varia(col2)
+   write(*,*) 'Desvio Padrão Coluna 1:',desvio(col1)
+   write(*,*) 'Desvio Padrão Coluna 2:',desvio(col2)
 
-      read(f_u, *, iostat=io)
-      if (io /= 0) exit
-      n = n + 1
 
-   end do 
+contains
 
-   close(unit=f_u)
+   integer function linhas() result(n)
    
-   allocate(a(n), b(n))
+      integer(i8):: n
+      n = 0
+      open(f_u, file="data.txt", iostat=io, status="OLD", action="read")
+          do 
+       
+             read(f_u, *, iostat=io)
+             if (io /= 0) exit
+             n = n + 1
+       
+          end do 
+      
+      close(unit=f_u)
+   
+   end function linhas
 
-   open(f_u, file="data.txt", iostat=io, status="OLD", action="read")
+   subroutine define(a, b)
+      
+      integer(i8) :: i
+      real(dp) :: a(linhas), b(linhas)
 
-   do i=1,n
+      i = 0
 
-   read(f_u, *, iostat=io) a(i), b(i)
-   media_a = media_a + (a(i)/n)
-   media_b = media_b + (b(i)/n)
-   if (io /= 0) exit
+      open(f_u, file="data.txt", iostat=io, status="OLD", action="read")
+   
+      do i=1, linhas
+   
+         read(f_u, *, iostat=io) a(i), b(i)
+         col1(i)=a(i)
+         col2(i)=b(i)
+         if (io /= 0) exit
+   
+      end do 
 
-   end do 
+      
+      close(unit=f_u)
 
-   do i=1,n 
+   end subroutine define
 
-   var_a = var_a + ((a(i) - media_a)*2)/(n-1)
-   var_b = var_b + ((b(i) - media_b)*2)/(n-1)
+   function media(m) result(m)
 
-   end do
+      integer(i8) :: j
+      real(dp) :: m
 
-   dp_a = sqrt(var_a)
-   dp_b = sqrt(var_b)
+      j = 0
+      m = 0
 
-   write(*,*) 'Média Coluna 1:',media_a 
-   write(*,*) 'Média Coluna 2:',media_b
-   write(*,*) 'Variância Coluna 1:',var_a
-   write(*,*) 'Variância Coluna 2:',var_b
-   write(*,*) 'Desvio Padrão Coluna 1:',dp_a
-   write(*,*) 'Desvio Padrão Coluna 2:',dp_b
+      do j=1, linhas
+
+         m = m + (m(j)/linhas)
+         if (io /= 0) exit
+   
+      end do 
+
+   end function media
+
+   function varia(var) result(var)
+
+      real(dp) :: var
+      integer(i8) :: k
+
+      var = 0
+      k = 0
+
+      do k=1, linhas 
+
+         var = var + ((var(i) - media(var))*2)/(linhas-1)
+
+      end do
+   
+   end function varia
+
+   function desvio(dv_p) result(dv_p)
+   
+      real(dp) :: d_p
+      dv_p = 0
+
+      dv_p = sqrt(var(dv_p))
+
+   end function desvio
 
 end program stats
 
