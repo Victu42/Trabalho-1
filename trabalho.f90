@@ -4,6 +4,7 @@ use estatistica_basica
 implicit none
 
    f_u = 11
+   f_u_2 = 12
    n_linhas = linhas()
 
    allocate(col1(n_linhas), col2(n_linhas))
@@ -16,6 +17,8 @@ implicit none
    write(*,*) 'Variância Coluna 2:',varia(col2)
    write(*,*) 'Desvio Padrão Coluna 1:',desvio(col1)
    write(*,*) 'Desvio Padrão Coluna 2:',desvio(col2)
+
+   call media_movel
 
 end program stats
 

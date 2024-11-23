@@ -4,7 +4,8 @@ use, intrinsic :: iso_fortran_env, only: sp => real32, dp => real64, i4 => int32
 implicit none
 
 real(dp), allocatable :: col1(:), col2(:)
-integer(i8) :: f_u, io, n_linhas
+integer(i8) :: f_u, io, n_linhas, f_u_2
+character (len = 1) :: input
 
 contains
 
@@ -89,7 +90,51 @@ contains
 
    end function desvio
 
+   subroutine media_movel
+      
+      real(dp), dimension(n_linhas) :: mm_1, mm_2
+      real(dp) :: calc_1, calc_2
+      integer(i8) :: l 
+      
+      do
+         print *, 'Gostaria de um arquivo com a média móvel dos seus dados? (Y/N)'
+         read(*,*) input
+         if (input /= "Y" .and. input /= "N") then
+            print *, 'Resposta inválida.'
+         else
+            exit 
+         end if
+      end do
 
+      if (input == 'Y') then
+         
+         open(f_u, file="data.txt", iostat=io, status="OLD", action="read")
+         open(f_u_2, file="data_media_movel.txt", iostat=io, status="NEW", action="write")
+         
+         mm_1(1) = (col1(1)+col1(2)+col1(3))/3
+         mm_1(2) = (col1(1)+col1(2)+col1(3)+col1(4))/4
+         mm_2(1) = (col2(1)+col2(2)+col2(3))/3
+         mm_2(2) = (col2(1)+col2(2)+col2(3)+col2(4))/4
+         mm_1(n_linhas) = (col1(n_linhas)+col1(n_linhas-1)+col1(n_linhas-2))/3
+         mm_1(n_linhas-1) = (col1(n_linhas)+col1(n_linhas-1)+col1(n_linhas-2)+col1(n_linhas-3))/4
+         mm_2(n_linhas) = (col2(n_linhas)+col2(n_linhas-1)+col2(n_linhas-2))/3
+         mm_2(n_linhas-1) = (col2(n_linhas)+col2(n_linhas-1)+col2(n_linhas-2)+col2(n_linhas-3))/4
+
+         do l = 3, n_linhas-2
+
+            mm_1(l) = (col1(l-2)+col1(l-1)+col1(l)+col1(l+1)+col1(l+2))/5
+            mm_2(l) = (col2(l-2)+col2(l-1)+col2(l)+col2(l+1)+col2(l+2))/5
+            write(f_u_2,*) mm_1(l), mm_2(l)
+
+         end do
+
+         close(f_u)
+         close(f_u_2)
+
+      end if
+
+
+   end subroutine media_movel
 
 
 end module
